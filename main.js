@@ -44,29 +44,94 @@ loader.load('./earth.glb', function (gltf) {
         }
     })
 
-    
     console.log('Model loaded:', gltf);
 
 }, undefined, function (error) {
     console.error(error);
 });
 
-const moon = new THREE.Mesh(
-    new THREE.SphereGeometry(0.1, 32, 32),
-    new THREE.MeshStandardMaterial({
-        color: 0xaaaaaa,
+loader.load('./ISS_stationary.glb', function (gltf) {
+    // Scale down the model
+    const scale = 0.001; // Adjust this value as needed
+    const iss = gltf.scene;
+    gltf.scene.scale.set(scale, scale, scale);
+
+    // Calculate the new bounding box
+    const bbox = new THREE.Box3().setFromObject(gltf.scene);
+    const center = bbox.getCenter(new THREE.Vector3());
+
+    // Center the model
+    gltf.scene.position.x = 1;
+    gltf.scene.position.y = 0.6;
+    gltf.scene.position.z = 0;
+
+    gltf.scene.rotation.y = Math.PI;
+    scene.add(gltf.scene);
+
+    // Add a soft white ambient light
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.001);
+    scene.add(ambientLight);
+
+    // console log bbox
+    console.log("ISS : ",  bbox);
+
+    gltf.scene.traverse(function (child) {
+        if (child.isMesh) {
+            child.material = new THREE.MeshStandardMaterial({
+                color : child.material.color,
+                map: child.material.map,
+            })
+        }
     })
-);
 
-moon.position.set(1, 0, 0);
+    console.log('Model loaded:', gltf);
+})
 
-scene.add(moon);
+var moon;
+
+loader.load('./moon.glb', function (gltf) {
+    // Scale down the model
+    const scale = 0.0003; // Adjust this value as needed
+    moon = gltf.scene;
+    gltf.scene.scale.set(scale, scale, scale);
+
+    // Calculate the new bounding box
+    const bbox = new THREE.Box3().setFromObject(gltf.scene);
+    const center = bbox.getCenter(new THREE.Vector3());
+
+    // Center the model
+    gltf.scene.position.x = 1;
+    gltf.scene.position.y = 0;
+    gltf.scene.position.z = 0;
+
+    gltf.scene.rotation.y = Math.PI;
+    scene.add(gltf.scene);
+
+    // Add a soft white ambient light
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.001);
+    scene.add(ambientLight);
+
+    // console log bbox
+    console.log("ISS : ",  bbox);
+
+    gltf.scene.traverse(function (child) {
+        if (child.isMesh) {
+            child.material = new THREE.MeshStandardMaterial({
+                color : child.material.color,
+                map: child.material.map,
+            })
+        }
+    })
+
+    console.log('Model loaded:', gltf);
+})
 
 // if I wheel the mouse, the camera will zoom in and out
 document.addEventListener('wheel', (event) => {
     camera.position.z += event.deltaY * 0.01;
 });
 
+var stars = new THREE.Group();
 
 for (let i = 0; i < 3000; i++) {
     const geometry = new THREE.SphereGeometry(0.33, 8, 8);
@@ -75,8 +140,10 @@ for (let i = 0; i < 3000; i++) {
     sphere.position.x = Math.random() * 1000 - 500;
     sphere.position.y = Math.random() * 1000 - 500;
     sphere.position.z = Math.random() * 1000 - 500;
-    scene.add(sphere);
+    stars.add(sphere);
 }
+
+scene.add(stars);
 
 // Renderer
 const renderer = new THREE.WebGLRenderer();
@@ -96,6 +163,7 @@ function animate() {
     angle += orbitSpeed;
     moon.position.x = Math.cos(angle) * 1;
     moon.position.z = Math.sin(angle) * 1;
+    moon.rotation.y += 0.01;
 }
 
 animate();
