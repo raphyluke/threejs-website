@@ -8,3 +8,19 @@ body {
     margin: 0;
     padding: 0;
 }
+
+header {
+  position: relative;
+}
+
+header h1 {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /*Text in 3D*/
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.3);
+  font-size: 4em;
+  font-weight: 900;
+  color: #fff;
+}
